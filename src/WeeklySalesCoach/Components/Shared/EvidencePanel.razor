@@ -1,0 +1,63 @@
+<section class="card evidence-panel">
+    <h2>This week's evidence</h2>
+    <p class="muted small">
+        Exactly what the AI sees. Quota attainment:
+        <strong>@Fmt.Percent(Context.QuotaAttainmentPercent)</strong> of @Fmt.Money(Context.Rep.WeeklyQuota).
+    </p>
+
+    <table class="data-table">
+        <thead><tr><th>Metric</th><th>This week</th><th>Last week</th><th>Team avg</th></tr></thead>
+        <tbody>
+            @foreach (var row in Rows())
+            {
+                <tr><td>@row.Label</td><td>@row.Current</td><td>@row.Previous</td><td>@row.Team</td></tr>
+            }
+        </tbody>
+    </table>
+
+    <h3 class="section-label">Pipeline</h3>
+    <table class="data-table">
+        <thead><tr><th>Client</th><th>Amount</th><th>Stage</th><th>In stage</th><th>Last contact</th></tr></thead>
+        <tbody>
+            @foreach (var d in Context.Deals)
+            {
+                <tr>
+                    <td>
+                        <strong>@d.Client</strong> <span class="muted">· @d.Product</span>
+                        <span class="deal-notes">@d.Notes@(d.LostReason is null ? "" : $" Lost: {d.LostReason}")</span>
+                    </td>
+                    <td>@Fmt.Money(d.Amount)</td>
+                    <td>@d.Stage</td>
+                    <td>@d.DaysInStage d</td>
+                    <td class="@(d.DaysSinceLastContact > 5 ? "warn" : "")">@d.DaysSinceLastContact d ago</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Context.ManagerNote is not null)
+    {
+        <p class="note"><strong>Manager note:</strong> @Context.ManagerNote</p>
+    }
+</section>
+
+@code {
+    [Parameter, EditorRequired] public CoachingContext Context { get; set; } = default!;
+    [Parameter] public string DealTerm { get; set; } = "Deal";
+
+    private IEnumerable<(string Label, string Current, string Previous, string Team)> Rows()
+    {
+        var c = Context.Current;
+        var p = Context.Previous;
+        var t = Context.TeamAverage;
+        const string none = "—";
+
+        yield return ("Calls made / connected", $"{c.CallsMade:0} / {c.CallsConnected:0}", p is null ? none : $"{p.CallsMade:0} / {p.CallsConnected:0}", $"{t.CallsMade:0.#} / {t.CallsConnected:0.#}");
+        yield return ("Emails sent / replied", $"{c.EmailsSent:0} / {c.EmailsReplied:0}", p is null ? none : $"{p.EmailsSent:0} / {p.EmailsReplied:0}", $"{t.EmailsSent:0.#} / {t.EmailsReplied:0.#}");
+        yield return ("New leads", $"{c.NewLeads:0}", p is null ? none : $"{p.NewLeads:0}", $"{t.NewLeads:0.#}");
+        yield return ("Applications", $"{c.ApplicationsSubmitted:0}", p is null ? none : $"{p.ApplicationsSubmitted:0}", $"{t.ApplicationsSubmitted:0.#}");
+        yield return ($"{DealTerm}s won / lost", $"{c.DealsWon:0} / {c.DealsLost:0}", p is null ? none : $"{p.DealsWon:0} / {p.DealsLost:0}", $"{t.DealsWon:0.#} / {t.DealsLost:0.#}");
+        yield return ("Won volume", Fmt.Money(c.WonVolume), p is null ? none : Fmt.Money(p.WonVolume), Fmt.Money(t.WonVolume));
+        yield return ("Avg. lead response", $"{c.AvgLeadResponseHours:0.#}h", p is null ? none : $"{p.AvgLeadResponseHours:0.#}h", $"{t.AvgLeadResponseHours:0.#}h");
+    }
+}

@@ -1,0 +1,307 @@
+{
+  "Ana Torres": {
+    "summary": "Strong week on output: $312,000 funded against a $250,000 quota (124.8%), 3 loans won versus a team average of 1.6, and 6 applications submitted versus 4.4 for the team. The gap is at the top of the funnel — average lead response time of 9.5 hours is nearly double the team average of 5.1, and one inbound lead has sat uncontacted for 8 days. Tightening early response is the clearest lever for next week.",
+    "strengths": [
+      {
+        "title": "Volume well above quota and team benchmark",
+        "detail": "You closed the week at 124.8% of quota on three funded loans, and your won volume was more than double the team average. This came from a mix of sizes (Hartwell Family at $210,000, M. Castillo at $72,000, J. Rivera at $30,000), not a single large file.",
+        "evidence": "Won volume $312,000 vs. $250,000 quota (124.8%); 3 deals won vs. team average of 1.6; team average won volume $139,400."
+      },
+      {
+        "title": "Persistent follow-up moved files to funding",
+        "detail": "The Hartwell Family mortgage funded after documented rate-lock follow-ups on 09-12 and 09-15, and J. Rivera went from approval to funding in the same week. Your follow-up cadence on active files is converting.",
+        "evidence": "Hartwell Family ($210,000, Funded) — notes cite follow-ups on 09-12 and 09-15; J. Rivera ($30,000) funded with same-week approval."
+      },
+      {
+        "title": "Efficient outreach conversion",
+        "detail": "You made fewer calls and sent fewer emails than the team average but connected and got replies more often, and converted that into more applications. Your activity is producing more per touch.",
+        "evidence": "38 calls (team 41.4) with 16 connects (team 14.6); 45 emails (team 55) with 14 replies (team 12.6); 6 applications submitted vs. team 4.4."
+      }
+    ],
+    "improvements": [
+      {
+        "title": "Lead response time is slipping and sits well above the team benchmark",
+        "detail": "Your average response to new leads was 9.5 hours this week, up from 8.8 hours last week and nearly double the team average of 5.1. With 9 new leads coming in, slower first contact reduces the number of leads that reach application.",
+        "evidence": "avgLeadResponseHours 9.5 this week vs. 8.8 last week and 5.1 team average; 9 new leads."
+      },
+      {
+        "title": "One inbound lead has had no contact for 8 days",
+        "detail": "J. Okafor (Personal Loan, $12,000) came in as an inbound web lead and the record shows no contact attempt in 8 days. T. Nguyen also shows a first call two days after inquiry. These are the two youngest opportunities in the pipeline and both are getting the slowest treatment.",
+        "evidence": "J. Okafor — Lead stage, 8 days in stage, 8 days since last contact, notes: 'Not contacted yet.' T. Nguyen — notes: 'first call two days after inquiry.'"
+      },
+      {
+        "title": "Largest pipeline opportunity lost on rate after a two-week negotiation",
+        "detail": "Pinecrest Dental ($350,000 Refinance) was lost to a competitor offering 0.25% lower. The data does not tell us whether a pricing exception was requested or when; worth capturing that detail so rate-driven losses can be escalated earlier next time.",
+        "evidence": "Pinecrest Dental, $350,000, Lost; lostReason: 'Competitor offered a 0.25% lower rate'; notes: 'Negotiated for two weeks.'"
+      }
+    ],
+    "actions": [
+      {
+        "action": "Contact J. Okafor on Monday morning and log the outcome, then review the two Lead-stage records (Okafor, T. Nguyen) for any other untouched inbound leads.",
+        "why": "An inbound lead with 8 days of no contact is the clearest recoverable item in your current pipeline.",
+        "successSignal": "J. Okafor shows a logged contact attempt by Monday end of day, and no lead in your pipeline exceeds 2 days since last contact by Friday."
+      },
+      {
+        "action": "Set a working target of first contact on inbound leads within 4 hours, and block two fixed lead-response windows each day (for example, morning and mid-afternoon) to handle new inquiries.",
+        "why": "Your response time moved the wrong way (8.8 to 9.5 hours) and is roughly double the 5.1-hour team average, which is the weakest point in an otherwise strong funnel.",
+        "successSignal": "avgLeadResponseHours under 6.0 next week, with the same or higher application count."
+      },
+      {
+        "action": "Write a short note on the Hartwell Family and J. Rivera files — what the follow-up cadence was and what triggered each touch — and on the Pinecrest Dental loss, including whether and when a rate exception was pursued.",
+        "why": "You have asked to mentor newer officers while keeping volume above quota; documented examples from your own funded and lost files give you reusable teaching material and make rate-driven losses easier to escalate earlier.",
+        "successSignal": "A one-page write-up on each of the three files available by end of next week to share in a team or one-to-one setting."
+      }
+    ],
+    "dataGaps": [
+      "No data on mentoring activity this week, so progress against your goal of mentoring newer officers could not be assessed.",
+      "No information on whether a pricing or rate exception was requested on Pinecrest Dental, or how the negotiation was structured.",
+      "No breakdown of when the 9 new leads arrived (time of day, weekday), so it is unclear how much of the 9.5-hour response average is driven by lead timing versus follow-up cadence.",
+      "No call or email quality data (content, objections raised), so only volume and conversion could be evaluated.",
+      "No manager note was provided for this week, so any time out of office or reassigned work is not reflected here."
+    ]
+  },
+  "Carlos Mendoza": {
+    "summary": "Carlos, you out-worked the team average on nearly every activity metric this week (72 calls vs 41.4, 90 emails vs 55, 12 new leads vs 7.4, 7 applications vs 4.4) and your 3.1-hour average lead response beat the team's 5.1 hours. The gap is at the back end of the funnel: 1 funded loan for $95,000 puts you at 63.3% of your $150,000 quota, and 2 losses vs a team average of 0.8. Three loans sitting in Documents Pending have had no contact for 7-9 days, and Greenway Landscaping was lost after the client went silent following a document request on 09-09. That is exactly the application-to-funding conversion you set as your personal goal, so next week's focus is follow-up discipline on pending documents.",
+    "strengths": [
+      {
+        "title": "Top-of-funnel output well above the team",
+        "detail": "You generated more activity and more applications than the team average across the board. That gives you enough volume to hit quota once conversion improves, so keep this level of prospecting intact while you fix the document stage.",
+        "evidence": "This week: 72 calls (team avg 41.4), 90 emails (team avg 55), 12 new leads (team avg 7.4) and 7 applications submitted (team avg 4.4)."
+      },
+      {
+        "title": "Fast lead response, and improving",
+        "detail": "You answer new leads faster than the team and you got faster than last week. Speed at first contact is a real advantage; the same responsiveness applied to in-flight files would move loans to funding.",
+        "evidence": "Average lead response 3.1 hours this week vs 3.4 hours last week and a 5.1-hour team average."
+      },
+      {
+        "title": "Clean execution on the file that closed",
+        "detail": "Delgado Family funded on schedule at $95,000, with contact 1 day ago. When you stay in weekly contact, the file moves.",
+        "evidence": "Delgado Family, Mortgage, $95,000, stage Funded, notes: \"Funded on schedule.\""
+      }
+    ],
+    "improvements": [
+      {
+        "title": "Loans stall in Documents Pending without contact",
+        "detail": "Three open files show days-since-contact almost identical to days-in-stage, meaning no follow-up since the document request. Together they represent $375,000 of pipeline that is not progressing toward funding.",
+        "evidence": "K. Patel ($240,000) 8 days in stage / 8 days since contact; Summit Auto Repair ($120,000) 10 days in stage / 9 days since contact; L. Moreno ($15,000) 7 days in stage / 7 days since contact."
+      },
+      {
+        "title": "A loss traced directly to a document-request gap",
+        "detail": "Greenway Landscaping was lost after the client stopped responding following the document request, with 9 days since last contact. A structured follow-up rhythm after every document request is the single highest-leverage change for your conversion goal.",
+        "evidence": "Greenway Landscaping, SBA Loan, $60,000, lost reason: \"Client went silent after the document request\"; documents requested 09-09, 9 days since last contact."
+      },
+      {
+        "title": "Email volume is high but reply rate is low",
+        "detail": "You sent 64% more emails than the team average but got fewer replies in absolute terms. Fewer, more targeted emails with a specific ask and deadline would likely produce more responses per hour spent.",
+        "evidence": "90 emails sent / 9 replies (10%) this week vs team average 55 sent / 12.6 replies (23%)."
+      }
+    ],
+    "actions": [
+      {
+        "action": "On Monday, call (not email) K. Patel, Summit Auto Repair and L. Moreno, restate the exact documents outstanding, and book a specific return date for each.",
+        "why": "All three have had no contact for 7-10 days and represent $375,000 in stalled pipeline; Greenway showed what happens when a document request goes unworked.",
+        "successSignal": "All three files have a logged contact and a client-committed document date by Tuesday 09-22; days-since-contact back to 0."
+      },
+      {
+        "action": "Set a fixed follow-up cadence for every document request: contact at day 2, day 5 and day 8 until documents arrive, and log it in the pipeline.",
+        "why": "Your funnel narrows between application and funding, which is your stated personal goal; the losses and stalls are concentrated at this step.",
+        "successSignal": "By the end of next week, no open loan shows more than 3 days since last contact."
+      },
+      {
+        "action": "Cut email volume to roughly team-average level and reallocate that time to follow-up calls, using one clear ask and a deadline per email.",
+        "why": "90 emails produced 9 replies (10%) versus a 23% team reply rate, so the extra volume is not converting into conversations.",
+        "successSignal": "Reply rate above 15% next week with calls connected held at or above this week's 21."
+      }
+    ],
+    "dataGaps": [
+      "No manager note or context on time out of office this week.",
+      "No data on call outcomes or what was discussed, so I cannot assess call quality or which conversations advanced files.",
+      "No historical application-to-funding conversion rate, so progress against your personal goal cannot be measured numerically yet.",
+      "No lead source or product-mix data, so I cannot tell whether the volume-per-funded-loan gap (95,000 vs 139,400 team average) is a mix or pricing issue.",
+      "No record of scheduled next steps or appointments for the open pipeline loans."
+    ]
+  },
+  "Laura Bennett": {
+    "summary": "Laura, this was a steady, well-executed week: you funded 2 loans for $88,000 (up from $79,000 last week), kept every active file in contact, and lost nothing from the pipeline. Your responsiveness and email engagement are clear strengths and sit well ahead of the team average. The gap to close is volume per loan — at 58.7% of your $150,000 quota, the work now is turning your strong activity into bigger deals, exactly the goal you set for yourself. The $400,000 Oakridge Pharmacy SBA referral is the best lever you have right now.",
+    "strengths": [
+      {
+        "title": "Outstanding responsiveness and client engagement",
+        "detail": "You answered new leads faster than anyone could reasonably expect and improved on your own pace from last week. Your emails are also landing: prospects are replying at roughly 37% of what you send, well above the team's ~23%. That combination is a big part of why nothing stalled in your pipeline this week.",
+        "evidence": "Avg lead response time 2.0 hours vs 2.2 last week and a team average of 5.1 hours; 22 replies from 60 emails sent vs team average of 12.6 replies from 55 emails."
+      },
+      {
+        "title": "Clean pipeline hygiene and no losses",
+        "detail": "Every open file shows recent contact, and you closed the week with zero lost loans. J. Harper's refinance moved into underwriting with all documents already in, and N. Brooks funded in 7 days. That discipline keeps deals moving without rework.",
+        "evidence": "0 loans lost this week (team average 0.8); daysSinceLastContact of 0 on Oakridge Pharmacy, J. Harper and C. Evans; N. Brooks auto loan funded in 7 days."
+      },
+      {
+        "title": "Consistent, improving throughput",
+        "detail": "You held your closing rate steady while nudging activity up across the board. Applications submitted rose from 3 to 4 and funded volume grew by $9,000 week over week — the base is solid, it just needs bigger loans running through it.",
+        "evidence": "Applications 4 (vs 3 last week, team average 4.4); 2 loans won (team average 1.6); won volume $88,000 vs $79,000 last week."
+      }
+    ],
+    "improvements": [
+      {
+        "title": "Average loan size is capping your volume",
+        "detail": "You are winning more loans than the team average but at a smaller size, which is what keeps you under quota. This is exactly the goal you named — closing larger loans — so the focus is on deliberately sourcing and prioritizing higher-value products rather than working harder on volume.",
+        "evidence": "2 loans won for $88,000 (avg ~$44,000 each) vs team average won volume of $139,400; quota attainment 58.7% of $150,000."
+      },
+      {
+        "title": "Top of funnel is narrower than the team's",
+        "detail": "You brought in 5 new leads for the second week running, below the team average of 7.4, and made fewer calls than the team typically does. With a smaller intake, more of your quota depends on a single large opportunity converting.",
+        "evidence": "5 new leads this week and 5 last week vs team average 7.4; 35 calls made vs team average 41.4."
+      },
+      {
+        "title": "Pipeline value is concentrated in one deal",
+        "detail": "Of roughly $467,000 in open pipeline, $400,000 sits with Oakridge Pharmacy, which is still at Lead stage after 2 days. That deal deserves a clear, dated next step, and it also needs company from one or two other large opportunities so the month doesn't hinge on a single outcome.",
+        "evidence": "Oakridge Pharmacy SBA Loan $400,000 in Lead stage (2 days), alongside J. Harper $45,000 and C. Evans $22,000."
+      }
+    ],
+    "actions": [
+      {
+        "action": "Book a defined next step with Oakridge Pharmacy before Wednesday — a discovery/needs call with the SBA document checklist sent in advance — and agree a target application date with the client.",
+        "why": "It is a warm referral worth $400,000 that alone would exceed your weekly quota, and it is still sitting at Lead stage.",
+        "successSignal": "Oakridge Pharmacy has moved out of Lead stage or has a confirmed application date on the calendar by Friday 2026-09-25."
+      },
+      {
+        "action": "Ask for two referrals from your recent funded clients: M. Diaz (who raised a future refinance) and the existing client who referred Oakridge Pharmacy. Aim to lift new leads from 5 to 7-8 for the week.",
+        "why": "Your referral-sourced lead produced your largest opportunity, and your lead intake has sat below the team average of 7.4 for two straight weeks.",
+        "successSignal": "7 or more new leads logged next week, including at least one referral conversation with M. Diaz."
+      },
+      {
+        "action": "Before dialing each day, sort your call list so that larger-ticket products (SBA, commercial, higher-value refinance) are contacted first, and add 6-8 extra dials to reach roughly team-average call volume.",
+        "why": "Your connect and reply rates are strong, so pointing that same activity at bigger loans is the most direct route from $44,000 to a higher average loan size.",
+        "successSignal": "At least one new opportunity above $100,000 entered in the pipeline next week, and calls made at or above 41."
+      }
+    ],
+    "dataGaps": [
+      "No manager note was provided, so any time out of office, territory changes or account reassignments are not reflected here.",
+      "No lead source or lead quality data, so I cannot tell whether the smaller loan sizes come from the leads you receive or from how opportunities are prioritized.",
+      "No historical data beyond last week, so I cannot confirm whether 58.7% attainment is a trend or a short-term dip.",
+      "No stage-conversion or cycle-time benchmarks, so I cannot assess how your 7-day funding on N. Brooks compares with typical turnaround.",
+      "No detail on quota structure (for example, whether product mix or loan type is weighted), so the path to $150,000 is assessed on volume alone."
+    ]
+  },
+  "Miguel Ortega": {
+    "summary": "A three-day week (two days out for compliance training) that still produced 140,000 in funded volume from the Whitaker Family mortgage — 70% of your 200,000 weekly quota and essentially level with the team average of 139,400. Activity volume was down against last week, which is expected given the days out. The clearest opening for next week is the pipeline: Ivanova is approved with no closing date and has had no contact for 6 days, and Coastal Freight (your SBA target segment, 350,000) has been in underwriting for 7 days without a touch.",
+    "strengths": [
+      {
+        "title": "Strong volume output in a short week",
+        "detail": "You funded a deal and hit 70% of quota in what was effectively a three-day week. Your won volume matched what the team produced across a full week, so output per available day was high.",
+        "evidence": "Whitaker Family mortgage funded at 140,000 vs. weekly quota of 200,000 (70%) and team average won volume of 139,400 — achieved while out 2 days for compliance training."
+      },
+      {
+        "title": "Call connect efficiency held up",
+        "detail": "You made fewer calls but converted a high share of them into conversations, so the dials you did place were productive.",
+        "evidence": "9 connects from 22 calls (41%) this week vs. team average of 14.6 connects from 41.4 calls (35%)."
+      },
+      {
+        "title": "A live SBA opportunity is advancing",
+        "detail": "Your stated goal is more commercial SBA business, and you have your largest pipeline deal sitting in underwriting in exactly that segment.",
+        "evidence": "Coastal Freight Co., SBA Loan, 350,000, in Underwriting for 7 days pending equipment appraisal."
+      }
+    ],
+    "improvements": [
+      {
+        "title": "Approved deal is stalling before close",
+        "detail": "Ivanova is approved but has no closing date scheduled and has not been contacted in nearly a week. This is revenue already earned that is not yet booked; scheduling the close is the fastest path to volume next week.",
+        "evidence": "S. Ivanova, Refinance, 190,000, stage Approved, 6 days in stage, 6 days since last contact, notes: \"closing date not yet scheduled.\""
+      },
+      {
+        "title": "Pipeline contact gaps of 6-8 days",
+        "detail": "Three of your four open files have gone without a touch for roughly a week. Even when the next step sits with a third party (appraisal, credit pull), a short status update keeps the file moving and the client informed.",
+        "evidence": "Coastal Freight 7 days since contact, E. Walsh 8 days since contact, S. Ivanova 6 days since contact."
+      },
+      {
+        "title": "Lead response time slowed",
+        "detail": "Your average response to new leads lengthened this week and now sits above both your own prior pace and the team benchmark. Worth confirming whether coverage was in place for the two days you were out.",
+        "evidence": "Average lead response 7 hours this week vs. 4.2 hours last week and a team average of 5.1 hours."
+      }
+    ],
+    "actions": [
+      {
+        "action": "Call S. Ivanova on Monday and lock a specific closing date, then confirm it in writing the same day.",
+        "why": "The loan is already approved; the only thing between you and 190,000 in funded volume is a scheduled date, and the file has been quiet for 6 days.",
+        "successSignal": "A confirmed closing date on the calendar for Ivanova by end of day Tuesday."
+      },
+      {
+        "action": "Chase the equipment appraisal on Coastal Freight Co. directly and give the client a status update with an expected timeline.",
+        "why": "It is your largest open file (350,000) and sits in your target SBA segment, but has had no contact for 7 days while waiting on a third party.",
+        "successSignal": "Appraisal delivery date confirmed and logged, and the client contacted before Wednesday."
+      },
+      {
+        "action": "Set a rule for yourself that no open file goes more than 3 business days without a touch, and clear the E. Walsh credit pull this week.",
+        "why": "Three files are currently at 6-8 days since last contact, and E. Walsh has been in Application for 8 days with the credit pull still pending.",
+        "successSignal": "All four open pipeline files show days-since-contact of 3 or less at the end of next week, and the Walsh credit pull is completed."
+      }
+    ],
+    "dataGaps": [
+      "Whether lead coverage was arranged during the 2 days out, so the 7-hour average response time cannot be fairly attributed.",
+      "Which days of the week you were actually working, so per-day activity rates are estimates only.",
+      "Any SBA prospecting activity beyond Coastal Freight — there is no data on new commercial leads sourced this week, so progress against your SBA goal cannot be fully assessed.",
+      "Outcomes or next steps from the 9 connected calls and 8 email replies.",
+      "Whether the P. Grant HELOC (lost — client postponed renovation) has a follow-up date set for when the renovation resumes."
+    ]
+  },
+  "Sofía Herrera": {
+    "summary": "Sofía, this was a milestone week: you funded your first loan (A. Ramos refinance, $62,000) and reached 77.5% of your $80,000 weekly quota. Activity grew across every channel compared with last week, and your lead response time improved from 6.5 to 4 hours, which is now faster than the team average of 5.1 hours. Your pipeline is clean and actively worked, with all four opportunities contacted within the last day. The next step is building volume: converting more of your consistent activity into submitted applications so your pipeline keeps producing funded loans week after week.",
+    "strengths": [
+      {
+        "title": "First funded loan closed",
+        "detail": "You closed and funded your first loan this week, which is exactly the goal you set for yourself. Your notes show you walked the client through the closing documents personally, which is the kind of ownership that builds referrals over time.",
+        "evidence": "A. Ramos refinance, $62,000, marked Funded; dealsWon went from 0 last week to 1 this week."
+      },
+      {
+        "title": "Meaningful step up in activity",
+        "detail": "You increased effort across every channel and it translated into more opportunities at the top and middle of your funnel. At 2 months in, this kind of week-over-week build is a strong foundation.",
+        "evidence": "Calls 28 → 40, connects 7 → 12, emails 35 → 50, replies 5 → 10, new leads 4 → 6, applications submitted 1 → 3."
+      },
+      {
+        "title": "Fast lead response and well-tended pipeline",
+        "detail": "You are getting back to leads quickly and no deal is sitting untouched, which keeps momentum with clients who are comparing options. Harbor Café shows two documented follow-ups on missing documents.",
+        "evidence": "Average lead response 6.5 → 4 hours (team average 5.1); all four pipeline deals show daysSinceLastContact of 1 or 0."
+      }
+    ],
+    "improvements": [
+      {
+        "title": "Build volume toward the weekly quota",
+        "detail": "One funded loan got you most of the way to quota, which shows a single strong deal matters. Carrying two or more fundable deals into the closing stage each week would give you a more reliable path over the line rather than depending on one.",
+        "evidence": "Won volume $62,000 against an $80,000 quota (77.5%); team average won volume was $139,400."
+      },
+      {
+        "title": "Increase applications submitted",
+        "detail": "Applications are the step that most directly feeds future fundings, and you are currently below the team level here. Your call and email volume is close to team average, so the opportunity is in moving more connected conversations into a submitted application.",
+        "evidence": "3 applications submitted vs. team average 4.4; 12 connects vs. team average 14.6."
+      },
+      {
+        "title": "Lift conversion on outreach touches",
+        "detail": "Your connect rate on calls was 30% (12 of 40) and your email reply rate 20% (10 of 50). Small changes in call timing or opening lines could raise connects without adding more dials.",
+        "evidence": "40 calls / 12 connects and 50 emails / 10 replies this week; team average 14.6 connects and 12.6 replies."
+      }
+    ],
+    "actions": [
+      {
+        "action": "Move Harbor Café ($90,000 SBA) out of Documents Pending by setting a specific document deadline with the client and sending a single checklist of exactly what is outstanding.",
+        "why": "It has been in Documents Pending for 3 days and is your largest near-term path to a second funded loan.",
+        "successSignal": "All missing documents received and the file advanced to Application by Friday."
+      },
+      {
+        "action": "Keep the Lopez Family mortgage ($280,000) on track by confirming the appraisal order date and scheduling the next client check-in before the week ends.",
+        "why": "It just entered Application with the appraisal being ordered, and proactive scheduling prevents idle days in stage.",
+        "successSignal": "Appraisal confirmed as ordered and a next contact date logged in the notes."
+      },
+      {
+        "action": "Set a target of 5 submitted applications next week and track which call or email approach produced each one.",
+        "why": "Applications submitted (3) is your clearest lever on future funded volume and is currently below the team average of 4.4.",
+        "successSignal": "5 applications submitted and a short note on which outreach approach generated the most connects."
+      }
+    ],
+    "dataGaps": [
+      "No manager note was provided, so any time out of office, training days or assigned accounts this week could not be factored in.",
+      "No win/loss reasons or stage-conversion history are available, so I could not assess where deals tend to stall or why.",
+      "No data on meetings held or discovery call quality, so the reason behind the 30% connect-to-application step is unclear.",
+      "No prior-week pipeline snapshot, so I could not measure how quickly deals are progressing between stages.",
+      "Product mix targets and expected ramp-up path for a 2-month tenure were not provided, so quota attainment is assessed only against the flat $80,000 weekly figure."
+    ]
+  }
+}

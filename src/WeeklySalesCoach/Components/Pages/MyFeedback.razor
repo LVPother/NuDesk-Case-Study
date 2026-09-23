@@ -1,0 +1,130 @@
+@page "/my-feedback"
+@attribute [Authorize(Roles = "Rep")]
+@inject CoachingService Coaching
+@inject CoachingContextBuilder ContextBuilder
+@inject IOptions<DomainOptions> Domain
+
+<PageTitle>My week · Weekly Sales Coach</PageTitle>
+
+@if (currentWeek is not null)
+{
+    <section class="hero hero--left hero--tight">
+        <PillBadge Text="@($"Week of {currentWeek.StartDate:MMM d} – {currentWeek.EndDate:MMM d, yyyy}")" />
+        <h1>Your week,<br /><span class="accent">@firstName</span></h1>
+        <p class="lead">Your numbers, your pipeline, and the coaching your manager shared with you.</p>
+    </section>
+
+    @if (thisWeek is not null)
+    {
+        <div class="notice notice--ready">
+            <div>
+                <h2>Your feedback for this week is ready</h2>
+                <p>Your manager reviewed and shared it on @thisWeek.Report.ApprovedAtUtc?.ToLocalTime().ToString("MMM d", CultureInfo.InvariantCulture).</p>
+            </div>
+            <a class="btn btn-primary btn-lg" href="/my-feedback/view">Read my feedback</a>
+        </div>
+    }
+    else
+    {
+        <div class="notice">
+            <div>
+                <h2>No feedback for this week yet</h2>
+                <p>Your manager hasn't shared this week's coaching yet. You'll see it here as soon as it's approved.</p>
+            </div>
+            @if (pastWeeks.Count > 0)
+            {
+                <a class="btn btn-outline" href="@($"/my-feedback/view?week={pastWeeks[0].Week.Id}")">Read last week's feedback</a>
+            }
+        </div>
+    }
+
+    @if (context is not null)
+    {
+        <div class="rep-grid">
+            <section class="card">
+                <div class="panel-head">
+                    <h2>This week vs. last week</h2>
+                    <span class="chip @(context.QuotaAttainmentPercent >= 100 ? "chip-green" : "chip-amber")">@Fmt.Percent(context.QuotaAttainmentPercent) of quota</span>
+                </div>
+                <div class="quota">
+                    <div class="quota-track"><div class="quota-bar" style="@($"width:{Math.Clamp(context.QuotaAttainmentPercent, 0, 100).ToString("0.#", CultureInfo.InvariantCulture)}%")"></div></div>
+                    <p class="muted"><strong>@Fmt.Money(context.Current.WonVolume)</strong> @Domain.Value.WonStage.ToLowerInvariant() of @Fmt.Money(context.Rep.WeeklyQuota) quota</p>
+                </div>
+                <MetricBars Rows="metricRows" />
+            </section>
+
+            <section class="card">
+                <h2>Your pipeline</h2>
+                <table class="data-table data-table--large">
+                    <thead><tr><th>Client</th><th>Amount</th><th>Stage</th><th>Last contact</th></tr></thead>
+                    <tbody>
+                        @foreach (var d in context.Deals)
+                        {
+                            <tr>
+                                <td><strong>@d.Client</strong> <span class="muted">· @d.Product</span></td>
+                                <td>@Fmt.Money(d.Amount)</td>
+                                <td>@d.Stage</td>
+                                <td class="@(d.DaysSinceLastContact > 5 ? "warn" : "")">@d.DaysSinceLastContact d ago</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    }
+
+    @if (pastWeeks.Count > 0 || thisWeek is not null)
+    {
+        <section class="history">
+            <h2>Past feedback</h2>
+            <nav class="history-nav" aria-label="Past weeks">
+                @foreach (var h in pastWeeks)
+                {
+                    <a class="history-link" href="@($"/my-feedback/view?week={h.Week.Id}")">Week of @h.Week.StartDate.ToString("MMM d", CultureInfo.InvariantCulture)</a>
+                }
+            </nav>
+            <p class="muted"><a href="/export/my-feedback.csv">Download my feedback (CSV)</a></p>
+        </section>
+    }
+}
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
+
+    private Week? currentWeek;
+    private CoachingContext? context;
+    private ReportHistoryEntry? thisWeek;
+    private List<ReportHistoryEntry> pastWeeks = [];
+    private List<MetricBars.Row> metricRows = [];
+    private string firstName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthStateTask).User;
+        firstName = (user.Identity?.Name ?? "").Split(' ')[0];
+        currentWeek = await Coaching.GetCurrentWeekAsync();
+
+        // The rep id comes from the auth cookie, so a rep only ever sees their own data.
+        if (user.GetRepId() is not int repId) return;
+
+        var history = await Coaching.GetApprovedHistoryAsync(repId);
+        thisWeek = history.FirstOrDefault(h => h.Week.IsCurrent);
+        pastWeeks = history.Where(h => !h.Week.IsCurrent).ToList();
+
+        context = await ContextBuilder.BuildAsync(repId, currentWeek.Id);
+        var c = context.Current; var p = context.Previous; var t = context.TeamAverage;
+        string N(double v) => v.ToString("0.#", CultureInfo.InvariantCulture);
+        string H(double v) => v.ToString("0.#", CultureInfo.InvariantCulture) + "h";
+        metricRows =
+        [
+            new("Calls made", c.CallsMade, p?.CallsMade, t.CallsMade, N),
+            new("Calls connected", c.CallsConnected, p?.CallsConnected, t.CallsConnected, N),
+            new("Emails sent", c.EmailsSent, p?.EmailsSent, t.EmailsSent, N),
+            new("Replies received", c.EmailsReplied, p?.EmailsReplied, t.EmailsReplied, N),
+            new("New leads", c.NewLeads, p?.NewLeads, t.NewLeads, N),
+            new("Applications", c.ApplicationsSubmitted, p?.ApplicationsSubmitted, t.ApplicationsSubmitted, N),
+            new($"{Domain.Value.DealTerm}s {Domain.Value.WonStage.ToLowerInvariant()}", c.DealsWon, p?.DealsWon, t.DealsWon, N),
+            new("Lead response time", c.AvgLeadResponseHours, p?.AvgLeadResponseHours, t.AvgLeadResponseHours, H),
+        ];
+    }
+}

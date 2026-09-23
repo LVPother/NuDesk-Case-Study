@@ -1,0 +1,108 @@
+@page "/login"
+@attribute [AllowAnonymous]
+@inject IOptions<DemoOptions> Demo
+@inject IDbContextFactory<AppDbContext> DbFactory
+@inject NavigationManager Nav
+
+<PageTitle>Sign in · Weekly Sales Coach</PageTitle>
+
+@if (deniedUser is not null)
+{
+    <section class="hero">
+        <h1>No access</h1>
+        <p class="lead">You're signed in as <strong>@deniedUser</strong>, and that account doesn't have access to the page you tried to open.</p>
+        <div class="hero-actions">
+            <a class="btn btn-primary" href="/">Go to my page</a>
+            <form method="post" action="/auth/logout">
+                <AntiforgeryToken />
+                <button class="btn btn-outline" type="submit">Sign out and switch account</button>
+            </form>
+        </div>
+    </section>
+    return;
+}
+
+<section class="hero">
+    <PillBadge Text="AI-assisted sales coaching" />
+    <h1>Weekly feedback your team<br /><span class="accent">can actually act on</span></h1>
+    <p class="lead">AI drafts evidence-based coaching for every rep. Managers review, edit and approve before anyone sees it.</p>
+</section>
+
+<div class="login-grid">
+    <form method="post" action="/auth/login" class="card form-card">
+        <AntiforgeryToken />
+        <h2>Sign in</h2>
+        @if (Error == 1)
+        {
+            <p class="form-error">Invalid username or password.</p>
+        }
+        @if (Denied == 1)
+        {
+            <p class="form-error">This account doesn't have access to that page.</p>
+        }
+        @if (Expired == 1)
+        {
+            <p class="form-error">That sign-in form was out of date (you signed in or out in another tab). Please try again.</p>
+        }
+        <label>Username <input name="username" autocomplete="username" required /></label>
+        <label>Password <input name="password" type="password" autocomplete="current-password" required /></label>
+        <button class="btn btn-primary" type="submit">Sign in</button>
+    </form>
+
+    @if (Demo.Value.EnableQuickLogin)
+    {
+        <div class="card demo-card">
+            <h2>Try the demo</h2>
+            <p class="demo-disclaimer">Demo accounts — for demonstration purposes only.</p>
+            @foreach (var account in accounts)
+            {
+                <form method="post" action="/auth/quick-login">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="username" value="@account.Username" />
+                    <button class="btn btn-outline btn-block" type="submit">
+                        <span>Sign in as <strong>@account.DisplayName</strong></span>
+                        <span class="muted small">@account.Label</span>
+                    </button>
+                </form>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private sealed record DemoAccount(string Username, string DisplayName, string Label);
+
+    [SupplyParameterFromQuery(Name = "error")] public int? Error { get; set; }
+    [SupplyParameterFromQuery(Name = "denied")] public int? Denied { get; set; }
+    [SupplyParameterFromQuery(Name = "expired")] public int? Expired { get; set; }
+    [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
+
+    private List<DemoAccount> accounts = [];
+    private string? deniedUser;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Already signed in: go home. Switching accounts goes through "Sign out", so a login form is never
+        // rendered for one user and submitted as another (that trips antiforgery validation).
+        // The one exception: a signed-in user who was denied a page gets told why instead of a silent redirect.
+        var user = (await AuthStateTask).User;
+        if (user.Identity?.IsAuthenticated == true)
+        {
+            if (Denied == 1)
+            {
+                deniedUser = user.Identity.Name;
+                return;
+            }
+            Nav.NavigateTo("/");
+            return;
+        }
+
+        await using var db = await DbFactory.CreateDbContextAsync();
+        var users = await db.Users.AsNoTracking().Include(u => u.Rep)
+            .OrderBy(u => u.Role).ThenBy(u => u.DisplayName)
+            .ToListAsync();
+        accounts = users
+            .Select(u => new DemoAccount(u.Username, u.DisplayName, u.Role == UserRole.Manager ? "Manager" : u.Rep?.Title ?? ""))
+            .ToList();
+    }
+}

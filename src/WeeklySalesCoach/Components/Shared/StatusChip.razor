@@ -1,0 +1,20 @@
+<span class="chip @Css">@Label</span>
+
+@code {
+    [Parameter] public ReportStatus Status { get; set; }
+    [Parameter] public bool IsEdited { get; set; }
+
+    private string Label => Status switch
+    {
+        ReportStatus.Approved => "Approved",
+        ReportStatus.Draft => IsEdited ? "Draft · edited" : "Draft ready",
+        _ => "Not generated",
+    };
+
+    private string Css => Status switch
+    {
+        ReportStatus.Approved => "chip-green",
+        ReportStatus.Draft => "chip-amber",
+        _ => "chip-gray",
+    };
+}

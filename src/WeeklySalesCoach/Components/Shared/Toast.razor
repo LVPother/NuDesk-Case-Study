@@ -1,0 +1,41 @@
+@implements IDisposable
+
+@if (visible)
+{
+    <div class="toast toast-@kind" role="status" aria-live="polite">@message</div>
+}
+
+@code {
+    private string message = "";
+    private string kind = "success";
+    private bool visible;
+    private CancellationTokenSource? hide;
+
+    /// <summary>Shows a short floating message (success | info | error) that hides itself after a few seconds.</summary>
+    public void Show(string text, string variant = "success", int milliseconds = 3500)
+    {
+        hide?.Cancel();
+        hide = new CancellationTokenSource();
+        message = text;
+        kind = variant;
+        visible = true;
+        StateHasChanged();
+        _ = HideLaterAsync(hide.Token, milliseconds);
+    }
+
+    private async Task HideLaterAsync(CancellationToken token, int milliseconds)
+    {
+        try
+        {
+            await Task.Delay(milliseconds, token);
+            visible = false;
+            await InvokeAsync(StateHasChanged);
+        }
+        catch (TaskCanceledException)
+        {
+            // Replaced by a newer toast.
+        }
+    }
+
+    public void Dispose() => hide?.Cancel();
+}

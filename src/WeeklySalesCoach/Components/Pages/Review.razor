@@ -1,0 +1,269 @@
+@page "/review/{RepId:int}"
+@attribute [Authorize(Roles = "Manager")]
+@rendermode InteractiveServer
+@inject CoachingService Coaching
+@inject CoachingContextBuilder ContextBuilder
+@inject IOptions<DomainOptions> Domain
+@inject FeedbackNotificationService Notifications
+@inject NavigationManager Nav
+
+<PageTitle>Review · Weekly Sales Coach</PageTitle>
+
+<DemoBanner />
+<Toast @ref="toast" />
+<a class="back-link" href="/dashboard">← Back to team</a>
+
+@if (loadError is not null)
+{
+    <p class="form-error">@loadError</p>
+}
+else if (context is null || report is null)
+{
+    <p class="muted">Loading…</p>
+}
+else
+{
+    <section class="hero hero--left hero--tight">
+        <PillBadge Text="@($"{context.Rep.Title} · {Tenure(context.Rep.TenureMonths)}")" />
+        <h1>@context.Rep.Name<br /><span class="accent">week of @context.WeekStart.ToString("MMM d", CultureInfo.InvariantCulture)</span></h1>
+        <p class="lead">Goal: @context.Rep.PersonalGoal · Prefers @context.Rep.FeedbackStyle.ToString().ToLowerInvariant() feedback</p>
+    </section>
+
+    <div class="review-grid">
+        <EvidencePanel Context="context" DealTerm="@Domain.Value.DealTerm" />
+
+        <section class="card review-panel">
+            <div class="panel-head">
+                <h2>Coaching feedback</h2>
+                <StatusChip Status="report.Status" IsEdited="report.IsEdited" />
+            </div>
+
+            @if (Approved == 1 && report.Status == ReportStatus.Approved)
+            {
+                <p class="form-info">Approved and shared with @FirstName. The email is in the outbox. <a href="/dashboard">Back to the team →</a></p>
+            }
+            @if (report.Status == ReportStatus.Draft && report.IsEdited && email is not null)
+            {
+                <p class="form-info form-info--amber">Being revised: @FirstName saw an earlier version. Approve again to share the new one.</p>
+            }
+            @if (error is not null)
+            {
+                <p class="form-error">@error</p>
+            }
+
+            @if (report.Status == ReportStatus.Approved)
+            {
+                <p class="review-lead">@content?.Summary</p>
+                <p class="muted">Approved @report.ApprovedAtUtc?.ToLocalTime().ToString("MMM d, h:mm tt", CultureInfo.InvariantCulture) · visible to @FirstName on their "My feedback" page</p>
+                <a class="btn btn-primary btn-lg" href="@($"/review/{RepId}/feedback")">Open the full feedback</a>
+                @if (email is not null)
+                {
+                    <div class="email-status">
+                        <p>
+                            <strong>Email to @email.ToAddress:</strong>
+                            @(email.Status switch
+                            {
+                                EmailStatus.Sent => $"sent via {email.Provider}",
+                                EmailStatus.Failed => $"failed ({email.Error})",
+                                _ => "queued — no email provider configured, see README",
+                            })
+                        </p>
+                        <details>
+                            <summary>Preview email</summary>
+                            <p><strong>Subject:</strong> @email.Subject</p>
+                            <pre class="email-body">@email.Body</pre>
+                        </details>
+                    </div>
+                }
+
+                <div class="revise">
+                    @if (confirmReopen)
+                    {
+                        <div class="confirm">
+                            <p>@FirstName will stop seeing this feedback until you approve the revised version. Continue?</p>
+                            <button class="btn btn-primary btn-sm" disabled="@busy" @onclick="ReopenAsync">Yes, revise it</button>
+                            <button class="btn btn-outline btn-sm" @onclick="() => confirmReopen = false">Cancel</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <button class="btn btn-outline" disabled="@busy" @onclick="() => confirmReopen = true">Revise feedback</button>
+                        <p class="hint">Reopens it as a draft: edit or regenerate, then approve and share again. @FirstName gets a second email.</p>
+                    }
+                </div>
+            }
+            else
+            {
+                @if (content is null)
+                {
+                    <p class="review-lead muted">No draft yet. Add any context below, then generate. You'll review the draft on its own screen before anything reaches @FirstName.</p>
+                }
+                else
+                {
+                    <p class="review-lead">@content.Summary</p>
+                    <a class="btn btn-primary btn-lg" href="@($"/review/{RepId}/feedback")">Open &amp; edit the draft</a>
+                }
+
+                <label class="field">
+                    Manager note <span class="muted">Optional context for the AI, e.g. time off or a special assignment.</span>
+                    <textarea rows="3" maxlength="@CoachingService.ManagerNoteMaxLength" @bind="managerNote" disabled="@busy"></textarea>
+                </label>
+
+                @if (confirmRegenerate)
+                {
+                    <div class="confirm">
+                        <p>This will replace the edited draft. Continue?</p>
+                        <button class="btn btn-primary btn-sm" disabled="@busy" @onclick="() => GenerateAsync(confirmed: true)">Yes, regenerate</button>
+                        <button class="btn btn-outline btn-sm" @onclick="() => confirmRegenerate = false">Cancel</button>
+                    </div>
+                }
+                else
+                {
+                    <button class="btn @(content is null ? "btn-primary btn-lg" : "btn-outline")" disabled="@busy" @onclick="() => GenerateAsync(confirmed: false)">
+                        @(busy ? "Generating… this takes about half a minute" : content is null ? "Generate draft with AI" : "Save note & regenerate")
+                    </button>
+                }
+            }
+        </section>
+    </div>
+
+    <section class="history">
+        <h2>History</h2>
+        <p class="muted">Every week with a report for @context.Rep.Name. Reps only ever see the approved ones.</p>
+        @{ var pastWeeks = history.Where(h => h.Week.Id != report.WeekId).ToList(); }
+        @if (pastWeeks.Count == 0)
+        {
+            <p class="muted">No other weeks yet.</p>
+        }
+        else
+        {
+            <ul class="history-list">
+                @foreach (var h in pastWeeks)
+                {
+                    <li class="card history-item">
+                        <div class="panel-head">
+                            <strong>Week of @h.Week.StartDate.ToString("MMM d", CultureInfo.InvariantCulture) – @h.Week.EndDate.ToString("MMM d, yyyy", CultureInfo.InvariantCulture)</strong>
+                            <StatusChip Status="h.Report.Status" IsEdited="h.Report.IsEdited" />
+                        </div>
+                        @if (CoachingService.ReadContent(h.Report) is { } past)
+                        {
+                            <details>
+                                <summary>View feedback</summary>
+                                <FeedbackView Content="past" />
+                            </details>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    </section>
+}
+
+@code {
+    [Parameter] public int RepId { get; set; }
+    [SupplyParameterFromQuery(Name = "approved")] public int? Approved { get; set; }
+
+    private CoachingContext? context;
+    private CoachingReport? report;
+    private CoachingContent? content;
+    private FeedbackEmail? email;
+    private IReadOnlyList<ReportHistoryEntry> history = [];
+    private Toast toast = default!;
+    private string? managerNote;
+    private bool busy;
+    private bool confirmRegenerate;
+    private bool confirmReopen;
+    private string? error;
+    private string? loadError;
+
+    private string FirstName => context?.Rep.Name.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
+
+    protected override async Task OnParametersSetAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        try
+        {
+            var week = await Coaching.GetCurrentWeekAsync();
+            // Build the context first: it throws for an unknown rep before we create any report row.
+            context = await ContextBuilder.BuildAsync(RepId, week.Id);
+            report = await Coaching.GetOrCreateReportAsync(RepId, week.Id);
+            content = CoachingService.ReadContent(report);
+            managerNote = report.ManagerNote;
+            // The latest email, if any: also tells us a draft was shared before and is now being revised.
+            email = await Notifications.GetForReportAsync(report.Id);
+            history = await Coaching.GetHistoryAsync(RepId);
+        }
+        catch (InvalidOperationException)
+        {
+            loadError = "This team member could not be found.";
+        }
+    }
+
+    private async Task GenerateAsync(bool confirmed)
+    {
+        if (report is null) return;
+        if (report.IsEdited && !confirmed)
+        {
+            confirmRegenerate = true;
+            return;
+        }
+
+        confirmRegenerate = false;
+        busy = true;
+        error = null;
+        try
+        {
+            await Coaching.SaveManagerNoteAsync(RepId, report.WeekId, managerNote);
+            await Coaching.GenerateAsync(RepId, report.WeekId);
+            // The draft gets its own, larger screen for reading and editing.
+            Nav.NavigateTo($"/review/{RepId}/feedback");
+        }
+        catch (Exception ex) when (ex is AiUnavailableException or InvalidCoachingContentException)
+        {
+            error = AiErrorMessages.For(ex);
+            toast.Show(error, "error", 6000);
+            await LoadAsync();
+            busy = false;
+        }
+        catch (InvalidOperationException ex)
+        {
+            await LoadAsync();
+            error = ex.Message;
+            toast.Show(error, "error", 6000);
+            busy = false;
+        }
+        catch (ArgumentException ex)
+        {
+            error = ex.Message;
+            toast.Show(error, "error", 6000);
+            busy = false;
+        }
+    }
+
+    private async Task ReopenAsync()
+    {
+        if (report is null) return;
+        busy = true;
+        error = null;
+        try
+        {
+            await Coaching.ReopenAsync(report.Id);
+            confirmReopen = false;
+            await LoadAsync();
+            toast.Show($"Reopened as a draft. {FirstName} no longer sees it until you approve again.", "info", 6000);
+        }
+        catch (InvalidOperationException ex)
+        {
+            error = ex.Message;
+            toast.Show(error, "error", 6000);
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private static string Tenure(int months) =>
+        months < 12 ? $"{months} month{(months == 1 ? "" : "s")}" : $"{months / 12} yr{(months / 12 == 1 ? "" : "s")}";
+}

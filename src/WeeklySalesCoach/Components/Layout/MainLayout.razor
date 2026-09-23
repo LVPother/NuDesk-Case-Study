@@ -1,0 +1,42 @@
+@inherits LayoutComponentBase
+@inject IOptions<DomainOptions> Domain
+
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" href="/"><span class="brand-mark">W</span><span>Weekly Sales <span class="accent">Coach</span></span></a>
+        <AuthorizeView>
+            <Authorized>
+                <nav class="topbar-nav">
+                    @if (context.User.IsInRole(nameof(UserRole.Manager)))
+                    {
+                        <a class="topbar-link" href="/dashboard">Team</a>
+                    }
+                    else
+                    {
+                        <a class="topbar-link" href="/my-feedback">My week</a>
+                    }
+                    <span class="topbar-user">
+                        @context.User.Identity?.Name
+                        <small>@(context.User.IsInRole(nameof(UserRole.Manager)) ? "Manager" : Domain.Value.RepTerm)</small>
+                    </span>
+                    <form method="post" action="/auth/logout">
+                        <AntiforgeryToken />
+                        <button class="btn btn-outline btn-sm" type="submit">Sign out</button>
+                    </form>
+                </nav>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+</header>
+
+<main class="page">
+    @Body
+</main>
+
+<footer class="footer">Weekly Sales Coach · AI drafts, managers decide · All demo data is fictional.</footer>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>

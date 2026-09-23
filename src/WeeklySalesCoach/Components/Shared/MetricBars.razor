@@ -1,0 +1,32 @@
+@* Small comparison chart: this week vs last week (and team average as a marker), pure CSS. *@
+<div class="metric-bars">
+    @foreach (var row in Rows)
+    {
+        var max = Math.Max(Math.Max(row.Current, row.Previous ?? 0), Math.Max(row.Team, 1));
+        <div class="metric-row">
+            <div class="metric-label">@row.Label</div>
+            <div class="metric-track">
+                <div class="metric-bar metric-bar--current" style="@($"width:{Pct(row.Current, max)}%")" title="This week"></div>
+                @if (row.Previous is double prev)
+                {
+                    <div class="metric-bar metric-bar--previous" style="@($"width:{Pct(prev, max)}%")" title="Last week"></div>
+                }
+                <div class="metric-marker" style="@($"left:{Pct(row.Team, max)}%")" title="Team average"></div>
+            </div>
+            <div class="metric-values">
+                <strong>@row.Format(row.Current)</strong>
+                <span class="muted">last wk @(row.Previous is double p ? row.Format(p) : "—") · team @row.Format(row.Team)</span>
+            </div>
+        </div>
+    }
+    <p class="metric-legend"><span class="swatch swatch--current"></span> This week <span class="swatch swatch--previous"></span> Last week <span class="swatch swatch--marker"></span> Team average</p>
+</div>
+
+@code {
+    public record Row(string Label, double Current, double? Previous, double Team, Func<double, string> Format);
+
+    [Parameter, EditorRequired] public IReadOnlyList<Row> Rows { get; set; } = [];
+
+    private static string Pct(double value, double max) =>
+        Math.Clamp(max <= 0 ? 0 : value / max * 100, 0, 100).ToString("0.#", CultureInfo.InvariantCulture);
+}

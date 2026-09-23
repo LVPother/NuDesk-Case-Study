@@ -1,0 +1,50 @@
+<div class="feedback @(Large ? "feedback--large" : "")">
+    <p class="feedback-summary">@Content.Summary</p>
+
+    <h3 class="section-label">What went well</h3>
+    <ul class="feedback-list list-strengths">
+        @foreach (var item in Content.Strengths)
+        {
+            <li><strong>@item.Title</strong><p>@item.Detail</p><p class="evidence">Evidence: @item.Evidence</p></li>
+        }
+    </ul>
+
+    <h3 class="section-label">Where to improve</h3>
+    <ul class="feedback-list list-improvements">
+        @foreach (var item in Content.Improvements)
+        {
+            <li><strong>@item.Title</strong><p>@item.Detail</p><p class="evidence">Evidence: @item.Evidence</p></li>
+        }
+    </ul>
+
+    <h3 class="section-label">Your focus for next week</h3>
+    <ul class="feedback-list list-actions">
+        @foreach (var action in Content.Actions)
+        {
+            <li>
+                <strong>@action.Action</strong>
+                <p>@action.Why</p>
+                @if (!string.IsNullOrWhiteSpace(action.SuccessSignal))
+                {
+                    <p class="evidence">Success looks like: @action.SuccessSignal</p>
+                }
+            </li>
+        }
+    </ul>
+
+    @if (Content.DataGaps.Count > 0)
+    {
+        <h3 class="section-label">Not enough data to assess</h3>
+        <ul class="muted small">
+            @foreach (var gap in Content.DataGaps)
+            {
+                <li>@gap</li>
+            }
+        </ul>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] public CoachingContent Content { get; set; } = default!;
+    [Parameter] public bool Large { get; set; }
+}

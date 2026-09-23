@@ -1,0 +1,70 @@
+@page "/my-feedback/view"
+@attribute [Authorize(Roles = "Rep")]
+@inject CoachingService Coaching
+
+<PageTitle>My feedback · Weekly Sales Coach</PageTitle>
+
+<a class="back-link" href="/my-feedback">← Back to my week</a>
+
+@if (currentWeek is not null)
+{
+    var shownWeek = selected?.Week ?? currentWeek;
+
+    <section class="hero hero--left hero--tight">
+        <PillBadge Text="@($"Week of {shownWeek.StartDate:MMM d} – {shownWeek.EndDate:MMM d, yyyy}")" />
+        <h1>Your coaching feedback,<br /><span class="accent">@firstName</span></h1>
+        <p class="lead">Reviewed and shared by your manager. Your past weeks stay here so you can look back any time.</p>
+    </section>
+
+    @if (history.Count > 1)
+    {
+        <nav class="history-nav" aria-label="Weeks">
+            @foreach (var h in history)
+            {
+                <a class="history-link @(shownWeek.Id == h.Week.Id ? "active" : "")" href="@(h.Week.IsCurrent ? "/my-feedback/view" : $"/my-feedback/view?week={h.Week.Id}")">
+                    @(h.Week.IsCurrent ? "This week" : $"Week of {h.Week.StartDate.ToString("MMM d", CultureInfo.InvariantCulture)}")
+                </a>
+            }
+        </nav>
+    }
+
+    @if (content is null)
+    {
+        <div class="card empty-state">
+            <h2>Nothing here yet</h2>
+            <p class="muted">Your manager hasn't shared feedback for this week yet.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card feedback-card">
+            <FeedbackView Content="content" Large="true" />
+            <p class="muted history-footnote">Shared @selected!.Report.ApprovedAtUtc?.ToLocalTime().ToString("MMM d, yyyy", CultureInfo.InvariantCulture).</p>
+        </div>
+    }
+}
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = default!;
+    [SupplyParameterFromQuery(Name = "week")] public int? WeekId { get; set; }
+
+    private Week? currentWeek;
+    private IReadOnlyList<ReportHistoryEntry> history = [];
+    private ReportHistoryEntry? selected;
+    private CoachingContent? content;
+    private string firstName = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = (await AuthStateTask).User;
+        firstName = (user.Identity?.Name ?? "").Split(' ')[0];
+        currentWeek = await Coaching.GetCurrentWeekAsync();
+        if (user.GetRepId() is not int repId) return;
+
+        history = await Coaching.GetApprovedHistoryAsync(repId);
+        selected = WeekId is int weekId
+            ? history.FirstOrDefault(h => h.Week.Id == weekId)
+            : history.FirstOrDefault(h => h.Week.IsCurrent);
+        content = selected is null ? null : CoachingService.ReadContent(selected.Report);
+    }
+}

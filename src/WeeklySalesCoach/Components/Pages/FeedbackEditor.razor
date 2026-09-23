@@ -1,0 +1,216 @@
+@page "/review/{RepId:int}/feedback"
+@attribute [Authorize(Roles = "Manager")]
+@rendermode InteractiveServer
+@inject CoachingService Coaching
+@inject FeedbackNotificationService Notifications
+@inject AuthenticationStateProvider AuthState
+@inject NavigationManager Nav
+
+<PageTitle>Feedback · Weekly Sales Coach</PageTitle>
+
+<Toast @ref="toast" />
+<NavigationLock OnBeforeInternalNavigation="OnBeforeNavigation" ConfirmExternalNavigation="IsDirty" />
+@* Buttons, not links: enhanced navigation would follow a link before the unsaved-edits check runs. *@
+<button type="button" class="back-link back-link--btn" @onclick="() => TryLeave(ReviewUrl)">← Back to @(repName is null ? "review" : repName)'s evidence</button>
+
+@if (loadError is not null)
+{
+    <p class="form-error">@loadError</p>
+}
+else if (report is null || content is null)
+{
+    <p class="muted">Loading…</p>
+}
+else
+{
+    <section class="hero hero--left hero--tight">
+        <PillBadge Text="@($"Week of {week!.StartDate:MMM d} – {week.EndDate:MMM d, yyyy}")" />
+        <h1>@(report.Status == ReportStatus.Approved ? "Approved feedback for" : "Coaching draft for")<br /><span class="accent">@repName</span></h1>
+        <p class="lead">
+            @if (report.Status == ReportStatus.Approved)
+            {
+                <text>Shared with @FirstName. This is exactly what they see.</text>
+            }
+            else
+            {
+                <text>Read it, change anything, then approve. Nothing reaches @FirstName until you do.</text>
+            }
+        </p>
+    </section>
+
+    @if (error is not null)
+    {
+        <p class="form-error">@error</p>
+    }
+
+    @if (report.Status == ReportStatus.Approved)
+    {
+        <div class="card feedback-card">
+            <FeedbackView Content="content" Large="true" />
+            <p class="muted">Approved @report.ApprovedAtUtc?.ToLocalTime().ToString("MMM d, h:mm tt", CultureInfo.InvariantCulture) · <StatusChip Status="report.Status" /></p>
+        </div>
+    }
+    else
+    {
+        <div class="card feedback-card editor-large">
+            <div class="panel-head">
+                <h2>Summary</h2>
+                <StatusChip Status="report.Status" IsEdited="report.IsEdited" />
+            </div>
+            <textarea class="editor-summary" rows="7" @bind="content.Summary" disabled="@busy"></textarea>
+
+            <FeedbackItemsEditor Heading="What went well" Items="content.Strengths" Disabled="busy" />
+            <FeedbackItemsEditor Heading="Where to improve" Items="content.Improvements" Disabled="busy" />
+
+            <h3 class="section-label">Focus for next week</h3>
+            @foreach (var action in content.Actions)
+            {
+                <div class="edit-item" @key="action">
+                    <textarea class="edit-title" rows="2" @bind="action.Action" aria-label="Action" disabled="@busy"></textarea>
+                    <textarea rows="2" @bind="action.Why" aria-label="Why" disabled="@busy"></textarea>
+                    <textarea class="edit-evidence" rows="2" @bind="action.SuccessSignal" aria-label="Success signal" disabled="@busy"></textarea>
+                    <button type="button" class="link-btn" disabled="@(busy || content.Actions.Count <= 1)" @onclick="() => content.Actions.Remove(action)">Remove</button>
+                </div>
+            }
+
+            <p class="muted">Draft source: @(report.Source == ReportSource.Live ? $"live AI ({report.ModelName})" : "pre-generated demo")</p>
+        </div>
+
+        @if (pendingUrl is not null)
+        {
+            <div class="confirm unsaved-confirm">
+                <p><strong>You have unsaved edits.</strong> Save them before leaving?</p>
+                <button class="btn btn-primary btn-sm" disabled="@busy" @onclick="SaveAndLeaveAsync">Save &amp; leave</button>
+                <button class="btn btn-outline btn-sm" disabled="@busy" @onclick="Leave">Leave without saving</button>
+                <button class="btn btn-outline btn-sm" disabled="@busy" @onclick="() => pendingUrl = null">Keep editing</button>
+            </div>
+        }
+
+        <div class="action-bar">
+            <button type="button" class="btn btn-outline" disabled="@busy" @onclick="() => TryLeave(ReviewUrl)">Back without approving</button>
+            <button class="btn btn-outline" disabled="@busy" @onclick="SaveEditsAsync">Save edits</button>
+            <button class="btn btn-primary btn-lg" disabled="@busy" @onclick="ApproveAsync">Approve &amp; share with @FirstName</button>
+        </div>
+    }
+}
+
+@code {
+    [Parameter] public int RepId { get; set; }
+
+    private CoachingReport? report;
+    private CoachingContent? content;
+    private Week? week;
+    private string? repName;
+    private bool busy;
+    private string? error;
+    private string? loadError;
+    private Toast toast = default!;
+    private string? savedSnapshot;
+    private string? pendingUrl;
+    private bool leaving;
+
+    private string FirstName => repName?.Split(' ', StringSplitOptions.RemoveEmptyEntries).FirstOrDefault() ?? "";
+
+    // Edits live in memory until "Save edits"; compare against what was loaded so leaving never loses them silently.
+    private bool IsDirty => content is not null && savedSnapshot is not null && CoachingContentParser.Serialize(content) != savedSnapshot;
+
+    private string ReviewUrl => $"/review/{RepId}";
+
+    // The in-page exits go through here: enhanced navigation follows a plain link before NavigationLock or an @onclick can stop it.
+    private void TryLeave(string url)
+    {
+        if (IsDirty)
+        {
+            pendingUrl = url;
+            return;
+        }
+        leaving = true;
+        Nav.NavigateTo(url);
+    }
+
+    private void OnBeforeNavigation(LocationChangingContext ctx)
+    {
+        if (leaving || !IsDirty) return;
+        ctx.PreventNavigation();
+        pendingUrl = ctx.TargetLocation;
+    }
+
+    private async Task SaveAndLeaveAsync()
+    {
+        await SaveEditsAsync();
+        if (error is null) Leave();
+    }
+
+    private void Leave()
+    {
+        if (pendingUrl is null) return;
+        leaving = true;
+        var url = pendingUrl;
+        pendingUrl = null;
+        Nav.NavigateTo(url);
+    }
+
+    protected override async Task OnParametersSetAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        week = await Coaching.GetCurrentWeekAsync();
+        var history = await Coaching.GetHistoryAsync(RepId);
+        var entry = history.FirstOrDefault(h => h.Week.Id == week.Id);
+        if (entry is null || entry.Report.ContentJson is null)
+        {
+            loadError = "There is no draft for this week yet. Go back and generate one first.";
+            return;
+        }
+
+        report = entry.Report;
+        content = CoachingService.ReadContent(report);
+        savedSnapshot = content is null ? null : CoachingContentParser.Serialize(content);
+        repName = (await Coaching.GetRepNameAsync(RepId)) ?? "this rep";
+    }
+
+    private async Task SaveEditsAsync()
+    {
+        if (report is null || content is null) return;
+        busy = true;
+        error = null;
+        try
+        {
+            var saved = await Coaching.SaveEditsAsync(report.Id, content);
+            await LoadAsync();
+            toast.Show(saved ? "Edits saved" : "No changes to save", saved ? "success" : "info");
+        }
+        catch (Exception ex) when (ex is InvalidCoachingContentException or InvalidOperationException)
+        {
+            error = ex.Message;
+            toast.Show("Not saved: " + ex.Message, "error", 6000);
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task ApproveAsync()
+    {
+        if (report is null || content is null) return;
+        busy = true;
+        error = null;
+        try
+        {
+            var user = (await AuthState.GetAuthenticationStateAsync()).User;
+            var userId = user.GetUserId() ?? throw new InvalidOperationException("You are not signed in.");
+            await Coaching.SaveEditsAsync(report.Id, content);
+            await Coaching.ApproveAsync(report.Id, userId);
+            await Notifications.QueueApprovedReportAsync(report.Id);
+            leaving = true; // everything was just saved; don't trigger the unsaved-edits guard
+            Nav.NavigateTo($"/review/{RepId}?approved=1");
+        }
+        catch (Exception ex) when (ex is InvalidCoachingContentException or InvalidOperationException)
+        {
+            error = ex.Message;
+            toast.Show("Not approved: " + ex.Message, "error", 6000);
+            busy = false;
+        }
+    }
+}

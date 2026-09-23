@@ -1,0 +1,8 @@
+@inject IFeedbackGenerator Generator
+
+@if (!Generator.IsLive)
+{
+    <div class="banner" role="status">
+        <strong>Demo mode:</strong> showing pre-generated AI feedback. Configure a Claude (or Gemini) API key to generate live (see README).
+    </div>
+}

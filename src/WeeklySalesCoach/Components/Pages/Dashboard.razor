@@ -1,0 +1,135 @@
+@page "/dashboard"
+@attribute [Authorize(Roles = "Manager")]
+@rendermode InteractiveServer
+@inject TeamDashboardService DashboardService
+@inject CoachingService Coaching
+@inject IOptions<DomainOptions> Domain
+
+<PageTitle>Team · Weekly Sales Coach</PageTitle>
+
+<DemoBanner />
+<Toast @ref="toast" />
+
+@if (dashboard is null)
+{
+    <p class="muted">Loading…</p>
+}
+else
+{
+    var k = dashboard.Kpis;
+    var terms = Domain.Value;
+
+    <section class="hero">
+        <PillBadge Text="@($"Week of {dashboard.Week.StartDate:MMM d} – {dashboard.Week.EndDate:MMM d, yyyy}")" />
+        <h1>Your team's week,<br /><span class="accent">coached by AI, approved by you</span></h1>
+        <p class="lead">Generate a draft for each @terms.RepTerm.ToLowerInvariant(), check the evidence, edit anything, then share it.</p>
+        <div class="hero-actions">
+            <button class="btn btn-primary" disabled="@busy" @onclick="GenerateTeamAsync">
+                @(busy ? progress : "Generate feedback for whole team")
+            </button>
+        </div>
+        <p class="hint">Skips reports that are already approved or that you edited by hand. <a href="/export/feedback.csv">Download all feedback (CSV)</a></p>
+        @if (info is not null)
+        {
+            <p class="form-info">@info</p>
+        }
+        @if (error is not null)
+        {
+            <p class="form-error">@error</p>
+        }
+    </section>
+
+    <section class="stats">
+        <StatCard Value="@Fmt.CompactMoney(k.WonVolume)" Label="@($"{terms.WonStage} volume · {Fmt.Percent(Calc.Attainment(k.WonVolume, k.TeamQuota))} of team quota")" />
+        <StatCard Value="@k.DealsWon.ToString(CultureInfo.InvariantCulture)" Label="@($"{terms.DealTerm}s {terms.WonStage.ToLowerInvariant()}")" />
+        <StatCard Value="@k.Applications.ToString(CultureInfo.InvariantCulture)" Label="Applications submitted" />
+        <StatCard Value="@($"{k.AvgLeadResponseHours:0.#}h")" Label="Avg. lead response time" />
+    </section>
+
+    <section class="section-mint">
+        <h2>@(terms.RepTerm)s</h2>
+        <div class="card-grid">
+            @foreach (var r in dashboard.Reps)
+            {
+                <a class="card rep-card" href="@($"/review/{r.RepId}")">
+                    <div class="rep-card-head">
+                        <span class="avatar">@r.Initials</span>
+                        <StatusChip Status="r.Status" IsEdited="r.IsEdited" />
+                    </div>
+                    <h3>@r.Name</h3>
+                    <p class="muted">@r.Title</p>
+                    <div class="progress"><div class="progress-bar" style="@($"width:{BarWidth(r.AttainmentPercent)}")"></div></div>
+                    <p class="rep-card-stat"><strong>@Fmt.CompactMoney(r.WonVolume)</strong> of @Fmt.CompactMoney(r.Quota) · @Fmt.Percent(r.AttainmentPercent)</p>
+                    <p class="rep-card-cta">@NextStep(r.Status) →</p>
+                </a>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    private TeamDashboard? dashboard;
+    private bool busy;
+    private string progress = "";
+    private string? error;
+    private string? info;
+    private Toast toast = default!;
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        var week = await Coaching.GetCurrentWeekAsync();
+        dashboard = await DashboardService.GetAsync(week.Id);
+    }
+
+    private async Task GenerateTeamAsync()
+    {
+        if (dashboard is null || busy) return;
+        busy = true;
+        error = null;
+        info = null;
+        var weekId = dashboard.Week.Id;
+        var total = dashboard.Reps.Count(r => r.Status != ReportStatus.Approved && !r.IsEdited);
+        var done = 0;
+        try
+        {
+            // One rep at a time; a rep whose output fails validation is reported and the run continues.
+            var result = await Coaching.GenerateTeamAsync(weekId, name =>
+            {
+                done++;
+                progress = $"Generating {done} of {total}: {name}…";
+                _ = InvokeAsync(StateHasChanged);
+            });
+            await LoadAsync();
+
+            info = $"{result.Generated.Count} draft(s) ready" + (result.Skipped.Count > 0 ? $", {result.Skipped.Count} skipped (approved or edited)" : "") + ".";
+            if (result.Failed.Count > 0)
+            {
+                error = string.Join(" ", result.Failed.Select(f => $"{f.RepName}: {f.Message}"))
+                    + (result.StoppedEarly ? " The run stopped there; the drafts already generated were saved." : " Open that rep and try again.");
+                toast.Show($"{result.Generated.Count} ready, {result.Failed.Count} failed", "error", 6000);
+            }
+            else
+            {
+                toast.Show(info);
+            }
+        }
+        finally
+        {
+            busy = false;
+            progress = "";
+        }
+    }
+
+    // Each card is a link; say what happens on the other side so the next step is obvious.
+    private static string NextStep(ReportStatus status) => status switch
+    {
+        ReportStatus.Approved => "See approved feedback",
+        ReportStatus.Draft => "Review the draft",
+        _ => "Generate a draft",
+    };
+
+    private static string BarWidth(double percent) =>
+        Math.Clamp(percent, 0, 100).ToString("0.#", CultureInfo.InvariantCulture) + "%";
+}
